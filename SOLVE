@@ -1,0 +1,243 @@
+Ci. yml
+
+name: CMake
+
+on:
+push:
+branches: [master]
+pull_request:
+branches: [master]
+
+jobs:
+build_Linux:
+
+runs-on: ubuntu-latest
+
+steps:
+- uses: actions/checkout@v3
+
+- name: Configure Solver
+run: cmake ${{github.workspace}} -B ${{github.workspace}}/build
+
+- name: Build Solver
+run: cmake —build ${{github.workspace}}/build
+Ci_release.yml
+
+name: CMake
+
+on:
+push:
+tags:
+- v**
+
+jobs:
+
+build_packages_Linux:
+
+runs-on: ubuntu-latest
+
+steps:
+- uses: actions/checkout@v3
+
+- name: Configure Solver
+run: cmake ${{github.workspace}} -B ${{github.workspace}}/build -D PRINT_VERSION=${GITHUB_REF_NAME#v}
+
+- name: Build Solver
+run: cmake —build ${{github.workspace}}/build
+
+- name: Build package
+run: cmake —build ${{github.workspace}}/build —target package
+
+- name: Build source package
+run: cmake —build ${{github.workspace}}/build —target package_source
+
+- name: Make a release
+uses: ncipollo/release-action@v1.10.0
+with:
+artifacts: "build/*.deb,build/*.tar.gz,build/*.zip"
+token: ${{ secrets.GITHUB_TOKEN }}
+Cmakelists.txt
+
+cmake_minimum_required(VERSION 3.4)
+
+project(solver)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/formatter_ex_lib formatter_ex_lib_dir)
+
+add_library(solver_lib ${CMAKE_CURRENT_SOURCE_DIR}/solver_lib/solver.cpp)
+add_executable(solver ${CMAKE_CURRENT_SOURCE_DIR}/solver_application/equation.cpp)
+
+target_include_directories(formatter_ex_lib PUBLIC
+${CMAKE_CURRENT_SOURCE_DIR}/formatter_lib
+${CMAKE_CURRENT_SOURCE_DIR}/formatter_ex_lib
+${CMAKE_CURRENT_SOURCE_DIR}/solver_lib
+)
+
+target_link_libraries(solver formatter_ex_lib formatter_lib solver_lib)
+
+# Инструкции для инсталляции
+install(TARGETS solver
+RUNTIME DESTINATION bin
+)
+
+# Дальше "передаём управление" CPack-у
+include(CPack.cmake)
+Ксения
+Ксения
+04.05.23
+Ксения
+Ксения
+04.05.23
+Вот еще папка formatter_ex_lib
+Там formatter_ex.cpp
+
+#include "formatter.h"
+
+std::ostream& formatter(std::ostream& out, const std::string& message)
+{
+return out « formatter(message);
+}
+Ксения
+Ксения
+04.05.23
+Formatter_ex.h
+
+#pragma once
+
+#include <string>
+#include <iostream>
+
+std::ostream& formatter(std::ostream& out, const std::string& message);
+И еще 1 Cmakelists.txt
+
+cmake_minimum_required(VERSION 3.4)
+
+project(formatter_ex_lib)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../formatter_lib formatter_lib_dir)
+
+add_library(formatter_ex_lib STATIC ${CMAKE_CURRENT_SOURCE_DIR}/formatter_ex.cpp)
+
+target_include_directories(formatter_ex_lib PUBLIC
+${CMAKE_CURRENT_SOURCE_DIR}/../formatter_lib
+)
+
+target_link_libraries(formatter_ex_lib formatter_lib)
+Теперь formatter_lib папка
+Там 3 файла
+Cmakelists
+
+cmake_minimum_required(VERSION 3.4)
+
+project(formatter_lib)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+add_library(formatter_lib STATIC ${CMAKE_CURRENT_SOURCE_DIR}/formatter.cpp ${CMAKE_CURRENT_SOURCE_DIR}/formatter.h)
+Formatter.cpp
+
+#include "formatter.h"
+
+std::string formatter(const std::string& message)
+{
+std::string res;
+res += "-------------------------\n";
+res += message + "\n";
+res += "-------------------------\n";
+return res;
+}
+Formatter.h
+
+#pragma once
+
+#include <string>
+
+std::string formatter(const std::string& message);
+Теперь папка solver application
+Там 2 файла
+Cmakelists
+
+cmake_minimum_required(VERSION 3.4)
+
+project(solver)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+add_subdirectory(/../formatter_ex_lib formatter_ex_lib_dir)
+
+add_library(solver_lib /../solver_lib/solver.cpp /../solver_lib/solver.h)
+add_executable(solver /equation.cpp)
+
+target_include_directories(formatter_ex_lib PUBLIC
+/../formatter_lib
+/../formatter_ex_lib
+/../solver_lib
+)
+
+target_link_libraries(solver formatter_ex_lib formatter_lib solver_lib)
+И éducation.cpp
+
+#include <iostream>
+
+#include "formatter_ex.h"
+#include "solver.h"
+
+int main()
+{
+float a = 0;
+float b = 0;
+float c = 0;
+
+std::cin » a » b » c;
+
+float x1 = 0;
+float x2 = 0;
+
+try
+{
+solve(a, b, c, x1, x2);
+
+formatter(std::cout, "x1 = " + std::to_string(x1));
+formatter(std::cout, "x2 = " + std::to_string(x2));
+}
+catch (const std::logic_error& ex)
+{
+formatter(std::cout, ex.what());
+}
+
+return 0;
+}
+И последняя папка solver.lib
+2 файла
+Solver.cpp
+
+#include "solver.h"
+
+#include <cmath>
+#include <stdexcept>
+
+void solve(float a, float b, float c, float& x1, float& x2)
+{
+float d = (b * b) - (4 * a * c);
+
+if (d < 0)
+{
+throw std::logic_error{"error: discriminant < 0"};
+}
+
+x1 = (-b - sqrt(d)) / (2 * a);
+x2 = (-b + sqrt(d)) / (2 * a);
+}
+Solver.h
+
+#pragma once
+
+void solve(float a, float b, float c, float& x1, float& x2);

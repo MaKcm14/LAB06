@@ -1,0 +1,3 @@
+/home/maksi/LAB03/lab03/formatter_lib/CMakeFiles/formatterLib.dir
+/home/maksi/LAB03/lab03/formatter_lib/CMakeFiles/edit_cache.dir
+/home/maksi/LAB03/lab03/formatter_lib/CMakeFiles/rebuild_cache.dir

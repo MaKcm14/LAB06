@@ -1,0 +1,6 @@
+/home/maksi/LAB03/lab03/solver/CMakeFiles/formatter_lib.dir
+/home/maksi/LAB03/lab03/solver/CMakeFiles/solver_lib.dir
+/home/maksi/LAB03/lab03/solver/CMakeFiles/formatter_ex_lib.dir
+/home/maksi/LAB03/lab03/solver/CMakeFiles/solver_app.dir
+/home/maksi/LAB03/lab03/solver/CMakeFiles/edit_cache.dir
+/home/maksi/LAB03/lab03/solver/CMakeFiles/rebuild_cache.dir

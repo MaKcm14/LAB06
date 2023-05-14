@@ -1,0 +1,5 @@
+/home/maksi/LAB03/lab03/hello_world/CMakeFiles/formatter_lib.dir
+/home/maksi/LAB03/lab03/hello_world/CMakeFiles/formatter_ex_lib.dir
+/home/maksi/LAB03/lab03/hello_world/CMakeFiles/hello_world.dir
+/home/maksi/LAB03/lab03/hello_world/CMakeFiles/edit_cache.dir
+/home/maksi/LAB03/lab03/hello_world/CMakeFiles/rebuild_cache.dir
